@@ -1,11 +1,23 @@
-import express from "express";
 import dotenv from "dotenv";
-import {sql} from "./config/db.js"
-
 dotenv.config();
 
-const app = express()
+// rateLimiter import comes after loading environment variables because import is reliant on those env vars
+import rateLimiter from "./middleware/rateLimiter.js";
+import express from "express";
+import {sql} from "./config/db.js"
+import argon2 from "argon2"
+import userRoute from "./routes/userRoute.js"
+
+const app = express();
+app.use(rateLimiter);
+app.use(express.json());
+
 const PORT = process.env.PORT || 5001;
+
+const USER_ROLE = Object.freeze({
+    TRAINER: 1,
+    STUDENT: 2
+})
 
 async function initDB() {
     try {
@@ -24,8 +36,8 @@ async function initDB() {
             );
         `;
 
-        await sql `CREATE UNIQUE INDEX idx_activeUser_username ON "user"(username) WHERE (is_deleted = FALSE);`;
-        await sql ` CREATE UNIQUE INDEX idx_activeUser_email ON "user"(email) WHERE (is_deleted = FALSE);`;
+        await sql `CREATE UNIQUE INDEX IF NOT EXISTS idx_activeUser_username ON "user"(username) WHERE (is_deleted = FALSE);`;
+        await sql `CREATE UNIQUE INDEX IF NOT EXISTS idx_activeUser_email ON "user"(email) WHERE (is_deleted = FALSE);`;
 
         await sql ` 
             CREATE TABLE IF NOT EXISTS trainingSession(
@@ -62,6 +74,88 @@ async function initDB() {
 app.get("/", (req, res) => {
     res.send("Server is working")
 });
+
+ 
+
+
+
+
+
+
+
+
+
+
+app.post("/api/trainingSession", async (req, res) => {
+    try {
+        // Parse request
+        const {title, description, start_time, end_time, trainerID} = req.body
+        if (!title) {
+            return res.status(400).json({
+                success: false,
+                message:"Title required to create Training Session",
+                data: null
+            })
+        }
+        else if (!start_time) {
+            return res.status(400).json({
+                success: false,
+                message:"Start Datetime required to create Training Session",
+                data: null
+            })
+        }
+        else if (!end_time) {
+            return res.status(400).json({
+                success: false,
+                message:"End Datetime required to create Training Session",
+                data: null
+            })
+        }
+        else if (!trainerID) {
+            return res.status(400).json({
+                success: false,
+                message:"Trainer ID required to create Training Session",
+                data: null
+            })
+        }
+
+        // create new training session in DB
+        const sqlResult = await sql`
+        INSERT INTO trainingSession(title, description, start_time, end_time, trainer_id)
+        VALUES (${title}, ${description}, ${start_time}, ${end_time}, ${trainerID})
+        RETURNING *`
+        console.log(sqlResult)
+        const trainingSession_data = sqlResult[0]
+
+        // return response
+        return res.status(201).json({
+            success: true,
+            message: "Training Session created",
+            data: trainingSession_data
+        })
+
+    } catch (error) {
+        console.log("Error, failed to create training session")
+        res.stataus(500).json({
+            success: false,
+            message:"Internal Server Error",
+            data: null
+        })
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+app.use("/api/user", userRoute)
+
 
 initDB().then(() => {
     app.listen(PORT, () => {
