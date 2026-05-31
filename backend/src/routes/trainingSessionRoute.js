@@ -6,3 +6,5 @@ import {
 const router = express.Router()
 
 router.post("/", addTrainingSession)
+
+export default router

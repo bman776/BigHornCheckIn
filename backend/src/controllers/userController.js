@@ -1,5 +1,10 @@
 import { sql } from "../config/db.js"
 
+const USER_ROLE = Object.freeze({
+    TRAINER: 1,
+    STUDENT: 2
+})
+
 async function getUserByID(req, res) {
     try {
         // Parse request
