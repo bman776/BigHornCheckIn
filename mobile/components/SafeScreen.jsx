@@ -1,13 +1,12 @@
-import { View } from 'react-native'
+import { View, Text } from 'react-native'
 import React from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-
-import {COLORS} from "@/constants/colors"
+import { COLORS } from "@/constants/colors.js"
 
 const SafeScreen = ({children}) => {
-  const insets = useSafeAreaInsets()
+    const insets = useSafeAreaInsets()
     return (
-    <View style={{padding:insets.top, flex:1, backgroundColor:COLORS.background}}>
+    <View style={{paddingTop:insets.top, flex:1, backgroundColor:COLORS}}>
       {children}
     </View>
   )
