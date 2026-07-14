@@ -32,6 +32,7 @@ async function getUserByID(req, res) {
                 data: null
             })
         }
+        // else User was found
 
         // Return response
         const user_data = sqlResult[0]

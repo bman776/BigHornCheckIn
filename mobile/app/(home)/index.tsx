@@ -2,10 +2,20 @@ import { Show, useUser } from '@clerk/expo'
 import { useClerk } from '@clerk/expo'
 import { Link } from 'expo-router'
 import { Text, View, Pressable, StyleSheet } from 'react-native'
+import { useTrainingSessions } from "../../hooks/useTrainingSessions";
+import { useEffect } from 'react';
 
 export default function Page() {
   const { user } = useUser()
   const { signOut } = useClerk()
+  const {trainingSessions, nextTrainingSession, isLoading, loadData, deletedTrainingSession } = useTrainingSessions(user?.id)
+
+  useEffect(() => {
+    loadData();
+  }, [loadData])
+
+  console.log("Training Sessions: ", trainingSessions);
+  console.log("Next Training Session:", nextTrainingSession)
 
   return (
     <View style={styles.container}>

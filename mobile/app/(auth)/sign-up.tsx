@@ -1,7 +1,12 @@
-import { useAuth, useSignUp } from '@clerk/expo'
+import { useAuth, useSignUp, isClerkAPIResponseError } from '@clerk/expo'
 import { type Href, Link, useRouter } from 'expo-router'
 import React from 'react'
-import { Text, Pressable, StyleSheet, TextInput, View } from 'react-native'
+import { Text, Pressable, StyleSheet, TextInput, View, TouchableOpacity } from 'react-native'
+import { styles as authStyles} from "@/assets/styles/auth.styles.js"
+import { COLORS } from "../../constants/colors";
+import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 export default function Page() {
   const { signUp, errors, fetchStatus } = useSignUp()
@@ -10,15 +15,26 @@ export default function Page() {
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
+  // const [firstName, setFirstName] = React.useState('')
+  // const [lastName, setLastName] = React.useState('')
   const [code, setCode] = React.useState('')
+  const [error, setError] = React.useState('')
 
   const handleSubmit = async () => {
     const { error } = await signUp.password({
       emailAddress,
-      password,
+      password
     })
-    if (error) {
-      console.error(JSON.stringify(error, null, 2))
+    if (isClerkAPIResponseError(error)) {
+      if (error.errors?.[0].code === "form_identifier_exists") {
+        setError("An account with that email address already exists, Please use another")
+      } else {
+        setError("An Error has occured, please try again")
+      }
+
+      // DEBUGGING
+      //console.error(JSON.stringify(error, null, 2))
+      
       return
     }
 
@@ -65,15 +81,26 @@ export default function Page() {
     signUp.missingFields.length === 0
   ) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>
+      <View style={authStyles.verificationContainer}>
+        <Text style={authStyles.verificationTitle}>
           Verify your account
         </Text>
+
+        {error ? (
+          <View style={authStyles.errorBox}>
+            <Ionicons name="alert-circle" size={20} color={COLORS.expense} />
+            <Text style={authStyles.errorText}>{error}</Text>
+            <TouchableOpacity onPress={() => setError("")}>
+              <Ionicons name="close" size={20} color={COLORS.textLight} />
+            </TouchableOpacity>
+          </View>
+        ) : null}
+
         <TextInput
-          style={styles.input}
+          style={[authStyles.verificationInput, error && authStyles.errorInput]}
           value={code}
           placeholder="Enter your verification code"
-          placeholderTextColor="#666666"
+          placeholderTextColor="#9A8478"
           onChangeText={(code) => setCode(code)}
           keyboardType="numeric"
         />
@@ -82,14 +109,14 @@ export default function Page() {
         )}
         <Pressable
           style={({ pressed }) => [
-            styles.button,
+            authStyles.button,
             fetchStatus === 'fetching' && styles.buttonDisabled,
             pressed && styles.buttonPressed,
           ]}
           onPress={handleVerify}
           disabled={fetchStatus === 'fetching'}
         >
-          <Text style={styles.buttonText}>Verify</Text>
+          <Text style={authStyles.buttonText}>Verify</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
@@ -102,68 +129,115 @@ export default function Page() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        Sign up
-      </Text>
+    <KeyboardAwareScrollView 
+      style={{flex:1}} 
+      contentContainerStyle={{flexGrow:1}} 
+      enableOnAndroid={true}
+      enableAutomaticScroll={true}
+      extraScrollHeight={100}
+    >
+      <View style={[authStyles.container]}>
 
-      <Text style={styles.label}>Email address</Text>
-      <TextInput
-        style={styles.input}
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Enter email"
-        placeholderTextColor="#666666"
-        onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
-        keyboardType="email-address"
-      />
-      {errors.fields.emailAddress && (
-        <Text style={styles.error}>{errors.fields.emailAddress.message}</Text>
-      )}
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        placeholder="Enter password"
-        placeholderTextColor="#666666"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      {errors.fields.password && (
-        <Text style={styles.error}>{errors.fields.password.message}</Text>
-      )}
-      <Pressable
-        style={({ pressed }) => [
-          styles.button,
-          (!emailAddress || !password || fetchStatus === 'fetching') && styles.buttonDisabled,
-          pressed && styles.buttonPressed,
-        ]}
-        onPress={handleSubmit}
-        disabled={!emailAddress || !password || fetchStatus === 'fetching'}
-      >
-        <Text style={styles.buttonText}>Sign up</Text>
-      </Pressable>
-      {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
-      {errors && <Text style={styles.debug}>{JSON.stringify(errors, null, 2)}</Text>}
+        <Image source={require("../../assets/images/BigHornLogo_main.png")} style={authStyles.illustration} />
 
-      <View style={styles.linkContainer}>
-        <Text>Already have an account? </Text>
-        <Link href="/sign-in">
-          <Text>Sign in</Text>
-        </Link>
+        <Text style={authStyles.title}>
+          Create Account
+        </Text>
+
+        {error ? (
+          <View style={authStyles.errorBox}>
+            <Ionicons name="alert-circle" size={20} color={COLORS.expense} />
+            <Text style={authStyles.errorText}>{error}</Text>
+            <TouchableOpacity onPress={() => setError("")}>
+              <Ionicons name="close" size={20} color={COLORS.textLight} />
+            </TouchableOpacity>
+          </View>
+        ) : null}
+
+        <TextInput
+          style={[authStyles.input, error && authStyles.errorInput]}
+          autoCapitalize="none"
+          value={emailAddress}
+          placeholder="Enter email"
+          placeholderTextColor="#9A8478"
+          onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
+          keyboardType="email-address"
+        />
+        {errors.fields.emailAddress && (
+          <Text style={styles.error}>{errors.fields.emailAddress.message}</Text>
+        )}
+
+        {/* <TextInput
+          style={[authStyles.input, error && authStyles.errorInput]}
+          value={firstName}
+          placeholder="Enter first name"
+          placeholderTextColor="#9A8478"
+          onChangeText={(firstName) => setFirstName(firstName)}
+        />
+        {errors.fields.firstName && (
+          <Text style={styles.error}>{errors.fields.firstName.message}</Text>
+        )}
+
+        <TextInput
+          style={[authStyles.input, error && authStyles.errorInput]}
+          value={lastName}
+          placeholder="Enter last name"
+          placeholderTextColor="#9A8478"
+          onChangeText={(lastName) => setLastName(lastName)}
+        />
+        {errors.fields.lastName && (
+          <Text style={styles.error}>{errors.fields.lastName.message}</Text>
+        )} */}
+
+        <TextInput
+          style={[authStyles.input, error && authStyles.errorInput]}
+          value={password}
+          placeholder="Enter password"
+          placeholderTextColor="#9A8478"
+          secureTextEntry={true}
+          onChangeText={(password) => setPassword(password)}
+        />
+        {errors.fields.password && (
+          <Text style={styles.error}>{errors.fields.password.message}</Text>
+        )}
+
+        <Pressable
+          style={({ pressed }) => [
+            authStyles.button,
+            (!emailAddress || !password || fetchStatus === 'fetching') && styles.buttonDisabled,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={handleSubmit}
+          disabled={!emailAddress || !password || fetchStatus === 'fetching'}
+        >
+          <Text style={authStyles.buttonText}>Sign up</Text>
+        </Pressable>
+
+        {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
+        {/*errors && <Text style={styles.debug}>{JSON.stringify(errors, null, 2)}</Text>*/}
+
+        <View style={styles.linkContainer}>
+          <Text>Already have an account? </Text>
+          <Link href="/sign-in">
+            <Text>Sign in</Text>
+          </Link>
+        </View>
+
+        {/* Required for sign-up flows. Clerk's bot sign-up protection is enabled by default */}
+        <View nativeID="clerk-captcha" />
       </View>
-
-      {/* Required for sign-up flows. Clerk's bot sign-up protection is enabled by default */}
-      <View nativeID="clerk-captcha" />
-    </View>
+    </KeyboardAwareScrollView>
   )
 }
 
+
+// Original Styles code that came with Clerk quick start guide
+// -----------------------------------------------------------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    gap: 12,
+    gap: 12
   },
   title: {
     marginBottom: 8,

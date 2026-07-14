@@ -1,7 +1,12 @@
-import { useSignIn } from '@clerk/expo'
+import { useSignIn, isClerkAPIResponseError} from '@clerk/expo'
 import { type Href, Link, useRouter } from 'expo-router'
 import React from 'react'
-import { Text, Pressable, StyleSheet, TextInput, View } from 'react-native'
+import { Text, Pressable, StyleSheet, TextInput, View, TouchableOpacity } from 'react-native'
+import { styles as authStyles} from "@/assets/styles/auth.styles.js"
+import { COLORS } from "../../constants/colors";
+import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 export default function Page() {
   const { signIn, errors, fetchStatus } = useSignIn()
@@ -10,14 +15,24 @@ export default function Page() {
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [code, setCode] = React.useState('')
+  const [error, setError] = React.useState('')
+
 
   const handleSubmit = async () => {
     const { error } = await signIn.password({
       emailAddress,
       password,
     })
-    if (error) {
-      console.error(JSON.stringify(error, null, 2))
+    if (isClerkAPIResponseError(error)) {
+      if (error.errors?.[0].code === "form_password_incorrect") {
+        setError("Password is incorrect please try again")
+      } else {
+        setError("An Error has occured, please try again")
+      }
+
+      // DEBUGGING
+      //console.error(JSON.stringify(error, null, 2))
+      
       return
     }
 
@@ -88,10 +103,11 @@ export default function Page() {
 
   if (signIn.status === 'needs_client_trust') {
     return (
-      <View style={styles.container}>
-        <Text style={[styles.title, { fontSize: 24, fontWeight: 'bold' }]}>
+      <View style={authStyles.container}>
+        <Text style={authStyles.verificationTitle}>
           Verify your account
         </Text>
+
         <TextInput
           style={styles.input}
           value={code}
@@ -131,57 +147,79 @@ export default function Page() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        Sign in
-      </Text>
+    <KeyboardAwareScrollView 
+      style={{flex:1}} 
+      contentContainerStyle={{flexGrow:1}} 
+      enableOnAndroid={true}
+      enableAutomaticScroll={true}
+      extraScrollHeight={100}
+    >
+      <View style={authStyles.container}>
 
-      <Text style={styles.label}>Email address</Text>
-      <TextInput
-        style={styles.input}
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Enter email"
-        placeholderTextColor="#666666"
-        onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
-        keyboardType="email-address"
-      />
-      {errors.fields.identifier && (
-        <Text style={styles.error}>{errors.fields.identifier.message}</Text>
-      )}
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        placeholder="Enter password"
-        placeholderTextColor="#666666"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      {errors.fields.password && (
-        <Text style={styles.error}>{errors.fields.password.message}</Text>
-      )}
-      <Pressable
-        style={({ pressed }) => [
-          styles.button,
-          (!emailAddress || !password || fetchStatus === 'fetching') && styles.buttonDisabled,
-          pressed && styles.buttonPressed,
-        ]}
-        onPress={handleSubmit}
-        disabled={!emailAddress || !password || fetchStatus === 'fetching'}
-      >
-        <Text style={styles.buttonText}>Continue</Text>
-      </Pressable>
-      {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
-      {errors && <Text style={styles.debug}>{JSON.stringify(errors, null, 2)}</Text>}
+        <Image source={require("../../assets/images/BigHornLogo_main.png")} style={authStyles.illustration} />
 
-      <View style={styles.linkContainer}>
-        <Text>Dont have an account? </Text>
-        <Link href="/sign-up">
-          <Text>Sign up</Text>
-        </Link>
+        <Text style={authStyles.title}>
+          Sign in
+        </Text>
+
+        {error ? (
+          <View style={authStyles.errorBox}>
+            <Ionicons name="alert-circle" size={20} color={COLORS.expense} />
+            <Text style={authStyles.errorText}>{error}</Text>
+            <TouchableOpacity onPress={() => setError("")}>
+              <Ionicons name="close" size={20} color={COLORS.textLight} />
+            </TouchableOpacity>
+          </View>
+        ) : null}
+
+        <TextInput
+          style={[authStyles.input, error && authStyles.errorInput]}
+          autoCapitalize="none"
+          value={emailAddress}
+          placeholder="Enter email"
+          placeholderTextColor="#9A8478"
+          onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
+          keyboardType="email-address"
+        />
+        {errors.fields.identifier && (
+          <Text style={styles.error}>{errors.fields.identifier.message}</Text>
+        )}
+
+        <TextInput
+          style={[authStyles.input, error && authStyles.errorInput]}
+          value={password}
+          placeholder="Enter password"
+          placeholderTextColor="#9A8478"
+          secureTextEntry={true}
+          onChangeText={(password) => setPassword(password)}
+        />
+        {errors.fields.password && (
+          <Text style={styles.error}>{errors.fields.password.message}</Text>
+        )}
+
+        <Pressable
+          style={({ pressed }) => [
+            authStyles.button,
+            (!emailAddress || !password || fetchStatus === 'fetching') && styles.buttonDisabled,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={handleSubmit}
+          disabled={!emailAddress || !password || fetchStatus === 'fetching'}
+        >
+          <Text style={authStyles.buttonText}>Continue</Text>
+        </Pressable>
+        {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
+        {/*errors && <Text style={styles.debug}>{JSON.stringify(errors, null, 2)}</Text>*/}
+
+        <View style={authStyles.footerContainer}>
+          <Text style={authStyles.footerText}>Dont have an account? </Text>
+          <Link href="/sign-up">
+            <Text style={authStyles.linkText}>Sign up</Text>
+          </Link>
+        </View>
+      
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   )
 }
 
