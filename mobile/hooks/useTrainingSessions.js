@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react"
 import { Alert } from "react-native"
 
-const API_URL = "http://localhost:5001/api" 
+const API_URL = "https://bighorncheckin-api.onrender.com" 
 
 export const useTrainingSessions = (trainerID) => {
     const [trainingSessions, setTrainingSessions] = useState([])
