@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react"
 import { Alert } from "react-native"
 
-const API_URL = "https://bighorncheckin-api.onrender.com" 
+const API_URL = "https://bighorncheckin-api.onrender.com/api" 
 
 export const useTrainingSessions = (trainerID) => {
     const [trainingSessions, setTrainingSessions] = useState([])
@@ -20,6 +20,10 @@ export const useTrainingSessions = (trainerID) => {
     const getAllTrainingSessionsForTrainer = useCallback(async () => {
         try{
             const response = await fetch(`${API_URL}/allTrainingSessionsForTrainer/${trainerID}`);
+            if (!response.ok) {
+                throw new Error(`HTTP Error! Status: ${response.status}`);
+            }
+            
             const data = await response.json();
             setTrainingSessions(data)
         } catch (error) {
@@ -29,7 +33,11 @@ export const useTrainingSessions = (trainerID) => {
 
     const getNextTrainingSessionForTrainer = useCallback(async () => {
         try{
-            const response = await fetch(`${API_URL}/trainingSession/nextTrainingSessionForTrainer${trainerID}`);
+            const response = await fetch(`${API_URL}/trainingSession/nextTrainingSessionForTrainer/${trainerID}`);
+            if (!response.ok) {
+                throw new Error(`HTTP Error! Status: ${response.status}`);
+            }
+
             const data = await response.json();
             setNextTrainingSession(data)
         } catch (error) {
