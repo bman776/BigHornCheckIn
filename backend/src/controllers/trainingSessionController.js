@@ -144,7 +144,7 @@ async function getAllTraininingSessionsForTrainer(req, res) {
         ORDER BY start_time ASC`
 
         // DEBUGGING
-        console.log(`database query result for getAllTrainingSessions: ${sql}`)
+        console.log(`database query result for getAllTrainingSessions: ${sqlResult}`)
 
         // check if Training Sessions found for Trainer
         if (sqlResult.length < 1) {
