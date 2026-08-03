@@ -86,7 +86,9 @@ async function getNextTrainingSessionForTrainer(req, res) {
             AND is_deleted = FALSE
         ORDER BY start_time ASC
         LIMIT 1`
-        console.log(sqlResult)
+        
+        // DEBUGGING
+        console.log(`database query result for getNextTrainingSession: ${sqlResult}`)
 
         // check if next Training Session for Trainer found
         if (sqlResult.length < 1) {
@@ -127,7 +129,7 @@ async function getAllTraininingSessionsForTrainer(req, res) {
         if (!trainerID) {
             return res.status(400).json({
                 success: false,
-                message:"Trainer ID required to get next Training Session for Trainer",
+                message:"Trainer ID required to get all Training Sessions for Trainer",
                 data: null
             })
         }
@@ -140,6 +142,9 @@ async function getAllTraininingSessionsForTrainer(req, res) {
             trainer_id = ${trainerID}
             AND is_deleted = FALSE
         ORDER BY start_time ASC`
+
+        // DEBUGGING
+        console.log(`database query result for getAllTrainingSessions: ${sql}`)
 
         // check if Training Sessions found for Trainer
         if (sqlResult.length < 1) {
