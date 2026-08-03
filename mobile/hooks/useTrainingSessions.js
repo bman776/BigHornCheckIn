@@ -24,7 +24,10 @@ export const useTrainingSessions = (trainerID) => {
                 throw new Error(`HTTP Error! Status: ${response.status}`);
             }
             
-            const data = await response.json();
+            // DEBUGGING
+            console.error(`Returned data: ${response}`)
+            
+            const data = await response.data;
             setTrainingSessions(data)
         } catch (error) {
             console.error("Error, failed to get Training Sessions", error)

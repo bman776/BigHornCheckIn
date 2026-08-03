@@ -64,6 +64,10 @@ async function getNextTrainingSessionForTrainer(req, res) {
     try {
         // parse request
         const {trainerID} = req.params;
+
+        // DEBUGGING
+        console.log(`trainer ID submitted is: ${trainerID}`)
+
         if (!trainerID) {
             return res.status(400).json({
                 success: false,
@@ -116,6 +120,10 @@ async function getAllTraininingSessionsForTrainer(req, res) {
     try {    
         // parse request
         const {trainerID} = req.params
+
+        // DEBUGGING
+        console.log(`trainer ID submitted is: ${trainerID}`)
+
         if (!trainerID) {
             return res.status(400).json({
                 success: false,
