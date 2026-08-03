@@ -31,10 +31,6 @@ export default function Page() {
       } else {
         setError("An Error has occured, please try again")
       }
-
-      // DEBUGGING
-      //console.error(JSON.stringify(error, null, 2))
-      
       return
     }
 
@@ -55,6 +51,9 @@ export default function Page() {
             console.log(session?.currentTask)
             return
           }
+
+          // DEV NOTE:
+          // Thinking we need to add logic here to add new user to database once email is verified
 
           // If no session tasks, navigate the signed-in user to the home page
           const url = decorateUrl('/')
@@ -84,6 +83,11 @@ export default function Page() {
       <View style={authStyles.verificationContainer}>
         <Text style={authStyles.verificationTitle}>
           Verify your account
+        </Text>
+
+        
+        <Text>
+          Email being verified: {emailAddress}
         </Text>
 
         {error ? (

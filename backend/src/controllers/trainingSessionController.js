@@ -33,6 +33,8 @@ async function addTrainingSession(req, res) {
             })
         }
 
+        // DEV NOTE: Add data sanitzation here? make sure given arguments are of the correct datatypes
+
         // create new training session in DB
         const sqlResult = await sql`
         INSERT INTO trainingSession(title, description, start_time, end_time, trainer_id)
@@ -84,7 +86,7 @@ async function getNextTrainingSessionForTrainer(req, res) {
 
         // check if next Training Session for Trainer found
         if (sqlResult.length < 1) {
-            res.status(404).json({
+            return res.status(404).json({
                 success: false,
                 message: "Next Training Session could not be found for Trainer",
                 data: null
@@ -133,7 +135,7 @@ async function getAllTraininingSessionsForTrainer(req, res) {
 
         // check if Training Sessions found for Trainer
         if (sqlResult.length < 1) {
-            res.status(404).json({
+            return res.status(404).json({
                 success: false,
                 message: "No Training Sessions could not be found for Trainer",
                 data: null

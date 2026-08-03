@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 export default function Page() {
   const { user } = useUser()
   const { signOut } = useClerk()
-  const {trainingSessions, nextTrainingSession, isLoading, loadData, deletedTrainingSession } = useTrainingSessions(user?.id)
+  const { trainingSessions, nextTrainingSession, isLoading, loadData, deleteTrainingSession } = useTrainingSessions(user?.id)
 
   useEffect(() => {
     loadData();
@@ -20,6 +20,7 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome!</Text>
+      <Text>User ID: {user?.id}</Text>
       <Text>Next Training Session: {nextTrainingSession.title}</Text>
       <Show when="signed-out">
         <Link href="/(auth)/sign-in">

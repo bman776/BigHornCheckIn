@@ -34,8 +34,11 @@ export const useTrainingSessions = (trainerID) => {
     const getNextTrainingSessionForTrainer = useCallback(async () => {
         try{
             const response = await fetch(`${API_URL}/trainingSession/nextTrainingSessionForTrainer/${trainerID}`);
+           
+            const result = await response.json();
+           
             if (!response.ok) {
-                throw new Error(`HTTP Error! Status: ${response.status}`);
+                throw new Error(result.message || `HTTP Error! Status: ${response.status}`);
             }
 
             const data = await response.json();

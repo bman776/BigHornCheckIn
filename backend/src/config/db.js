@@ -17,23 +17,35 @@ export const sql = neon(process.env.DATABASE_URL);
 
 export async function initDB() {
     try {
-        await sql`
-            CREATE TABLE IF NOT EXISTS "user"(
-                id SERIAL PRIMARY KEY,
-                first_name VARCHAR(50) NOT NULL,
-                last_name VARCHAR(50) NOT NULL,
-                username VARCHAR(50) NOT NULL,
-                email VARCHAR(50) NOT NULL,
-                password_hash TEXT NOT NULL,
-                role INTEGER NOT NULL,
-                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                is_deleted BOOLEAN DEFAULT FALSE,
-                deleted_at TIMESTAMP WITH TIME ZONE
-            );
-        `;
+        // DEV NOTE: Clerk service is now going to handle recording user accounts
+        // await sql`
+        //     CREATE TABLE IF NOT EXISTS "user"(
+        //         id SERIAL PRIMARY KEY,
+        //         clerk_id VARCHAR(100) NOT NULL
+        //         first_name VARCHAR(50),
+        //         last_name VARCHAR(50),
+        //         email VARCHAR(50) NOT NULL,
+        //         role INTEGER NOT NULL,
+        //         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        //         is_deleted BOOLEAN DEFAULT FALSE,
+        //         deleted_at TIMESTAMP WITH TIME ZONE
+        //     );
+        // `;
 
-        await sql `CREATE UNIQUE INDEX IF NOT EXISTS idx_activeUser_username ON "user"(username) WHERE (is_deleted = FALSE);`;
-        await sql `CREATE UNIQUE INDEX IF NOT EXISTS idx_activeUser_email ON "user"(email) WHERE (is_deleted = FALSE);`;
+        // await sql `CREATE UNIQUE INDEX IF NOT EXISTS idx_activeUser_username ON "user"(username) WHERE (is_deleted = FALSE);`;
+        // await sql `CREATE UNIQUE INDEX IF NOT EXISTS idx_activeUser_email ON "user"(email) WHERE (is_deleted = FALSE);`;
+
+        // DEV NOTE: Ditching users roles for the sake of simplicity
+        // await sql `
+        //     CREATE TABLE IF NOT EXISTS role(
+        //         id serial PRIMARY KEY,
+        //         clerk_id VARCHAR(100) NOT NULL,
+        //         role INTEGER NOT NULL,
+        //         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        //         is_deleted BOOLEAN DEFAULT FALSE,
+        //         deleted_at TIMESTAMP WITH TIME ZONE
+        //     );
+        // `;
 
         await sql ` 
             CREATE TABLE IF NOT EXISTS trainingSession(
@@ -42,7 +54,7 @@ export async function initDB() {
                 description VARCHAR(200),
                 start_time TIMESTAMP WITH TIME ZONE NOT NULL,
                 end_time TIMESTAMP WITH TIME ZONE NOT NULL,
-                trainer_id INTEGER NOT NULL REFERENCES "user"(id),
+                trainer_id VARCHAR(100) NOT NULL,
                 is_deleted BOOLEAN DEFAULT FALSE,
                 deleted_at TIMESTAMP WITH TIME ZONE
             );
@@ -51,7 +63,7 @@ export async function initDB() {
         await sql `
             CREATE TABLE IF NOT EXISTS attendance(
                 id SERIAL PRIMARY KEY,
-                attendee_id INTEGER NOT NULL REFERENCES "user"(id),
+                attendee_id VARCHAR(100) NOT NULL,
                 trainingSession_id INTEGER NOT NULL REFERENCES trainingSession(id),
                 attended BOOLEAN NOT NULL,
                 is_deleted BOOLEAN DEFAULT FALSE,

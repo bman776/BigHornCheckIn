@@ -1,3 +1,7 @@
+// DEV NOTE
+// Clerk now handles all user information, not the neon Database, this file will likley be deprecated soon
+
+
 import { sql } from "../config/db.js"
 
 const USER_ROLE = Object.freeze({
@@ -51,6 +55,51 @@ async function getUserByID(req, res) {
         })
     }
 }
+
+async function getUserByEmail(req, res) {
+    try {
+        // Parse request
+        const {userEmail} = req.params
+        if (!userEmail) {
+            return res.status(400).json({message:"user ID requried to get user"})
+        }
+
+        // Get User from the DB
+        const sqlResult = await sql`
+        SELECT *
+        FROM "user"
+        WHERE email = ${userEmail}
+        ORDER BY created_at DESC`
+        console.log(sqlResult)
+
+        // Check if user found
+        if (sqlResult.length < 1) {
+            res.status(404).json({
+                success: false,
+                message: "User could not be found",
+                data: null
+            })
+        }
+        // else User was found
+
+        // Return response
+        const user_data = sqlResult[0]
+        res.status(200).json({
+            success: true,
+            message: "User Found",
+            data: user_data
+        }) 
+
+    } catch (error) {
+        console.log("Error, failed to get User")
+        res.status(500).json({
+            success: false,
+            message:`Internal Server Error: ${error}`,
+            data: null
+        })
+    }
+}
+
 
 async function addUser(req, res) {
     try {
