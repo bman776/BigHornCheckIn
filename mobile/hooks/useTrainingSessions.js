@@ -19,7 +19,7 @@ export const useTrainingSessions = (trainerID) => {
     // useCallback is used for performance reasons, it will memoize the function
     const getAllTrainingSessionsForTrainer = useCallback(async () => {
         try{
-            const response = await fetch(`${API_URL}/allTrainingSessionsForTrainer/${trainerID}`);
+            const response = await fetch(`${API_URL}/trainingSession/allTrainingSessionsForTrainer/${trainerID}`);
             if (!response.ok) {
                 throw new Error(`HTTP Error! Status: ${response.status}`);
             }
