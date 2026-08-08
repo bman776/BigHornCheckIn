@@ -88,7 +88,7 @@ async function getNextTrainingSessionForTrainer(req, res) {
         LIMIT 1`
         
         // DEBUGGING
-        console.log(`database query result for getNextTrainingSession: ${sqlResult}`)
+        console.log(`database query result for getNextTrainingSession: ${JSON.stringify(sqlResult)}`)
 
         // check if next Training Session for Trainer found
         if (sqlResult.length < 1) {
@@ -144,7 +144,7 @@ async function getAllTraininingSessionsForTrainer(req, res) {
         ORDER BY start_time ASC`
 
         // DEBUGGING
-        console.log(`database query result for getAllTrainingSessions: ${sqlResult}`)
+        console.log(`database query result for getAllTrainingSessions: ${JSON.stringify(sqlResult)}`)
 
         // check if Training Sessions found for Trainer
         if (sqlResult.length < 1) {

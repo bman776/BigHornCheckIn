@@ -25,9 +25,13 @@ export const useTrainingSessions = (trainerID) => {
             }
             
             // DEBUGGING
-            console.error(`Returned data: ${response}`)
+            console.error(`Returned response for getAllTrainingSessionsForTrainer: ${JSON.stringify(response)}`)
             
-            const data = await response.data;
+            const data = await response.json();
+            
+            // DEBUGGING
+            console.error(`Returned data for getAllTrainingSessionsForTrainer: ${JSON.stringify(data)}`)
+
             setTrainingSessions(data)
         } catch (error) {
             console.error("Error, failed to get Training Sessions", error)
@@ -38,6 +42,8 @@ export const useTrainingSessions = (trainerID) => {
         try{
             const response = await fetch(`${API_URL}/trainingSession/nextTrainingSessionForTrainer/${trainerID}`);
            
+            console.error(`Returned response for getNextTrainingSessionForTrainer: ${JSON.stringify(response)}`)
+
             const result = await response.json();
            
             if (!response.ok) {
@@ -45,6 +51,10 @@ export const useTrainingSessions = (trainerID) => {
             }
 
             const data = await response.json();
+
+            // DEBUGGING
+            console.error(`Returned data for getNextTrainingSessionForTrainer: ${JSON.stringify(data)}`)
+
             setNextTrainingSession(data)
         } catch (error) {
             console.error("Error, failed to get next Training Session", error)
