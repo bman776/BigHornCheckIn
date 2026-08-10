@@ -19,6 +19,11 @@ if (process.env.NODE_ENV === "production") {
     job.start();
 }
 
+// health check
+app.get("api/health", (req, res) => {
+    res.status(200).json({status: "ok"}) 
+})
+
 // set up middleware
 app.use(rateLimiter);
 app.use(express.json());
