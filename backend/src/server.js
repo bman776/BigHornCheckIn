@@ -7,12 +7,17 @@ import express from "express";
 import argon2 from "argon2"
 import userRoute from "./routes/userRoute.js"
 import trainingSessionRoute from "./routes/trainingSessionRoute.js"
+import job from "./config/cron.js";
 import { initDB } from "./config/db.js"
+
 
 const PORT = process.env.PORT || 5001;
 
-
 const app = express();
+
+if (process.env.NODE_ENV === "production") {
+    job.start();
+}
 
 // set up middleware
 app.use(rateLimiter);

@@ -121,7 +121,7 @@ async function getNextTrainingSessionForTrainer(req, res) {
 async function getAllTraininingSessionsForTrainer(req, res) {
     try {    
         // parse request
-        const {trainerID} = req.params
+        const {trainerID} = req.params;
 
         // DEBUGGING
         console.log(`trainer ID submitted is: ${trainerID}`)

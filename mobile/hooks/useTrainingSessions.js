@@ -25,14 +25,15 @@ export const useTrainingSessions = (trainerID) => {
             }
             
             // DEBUGGING
-            console.error(`Returned response for getAllTrainingSessionsForTrainer: ${JSON.stringify(response)}`)
+            console.log(`Returned response for getAllTrainingSessionsForTrainer: ${JSON.stringify(response)}`)
             
-            const data = await response.json();
+            const respBody = await response.json();
             
             // DEBUGGING
-            console.error(`Returned data for getAllTrainingSessionsForTrainer: ${JSON.stringify(data)}`)
+            console.log(`Returned data for getAllTrainingSessionsForTrainer: ${JSON.stringify(respBody)}`)
 
-            setTrainingSessions(data)
+            setTrainingSessions(respBody)
+        
         } catch (error) {
             console.error("Error, failed to get Training Sessions", error)
         }
@@ -41,21 +42,20 @@ export const useTrainingSessions = (trainerID) => {
     const getNextTrainingSessionForTrainer = useCallback(async () => {
         try{
             const response = await fetch(`${API_URL}/trainingSession/nextTrainingSessionForTrainer/${trainerID}`);
-           
-            console.error(`Returned response for getNextTrainingSessionForTrainer: ${JSON.stringify(response)}`)
-
-            const result = await response.json();
-           
             if (!response.ok) {
-                throw new Error(result.message || `HTTP Error! Status: ${response.status}`);
+                throw new Error(respBody.message || `HTTP Error! Status: ${response.status}`);
             }
 
-            const data = await response.json();
-
             // DEBUGGING
-            console.error(`Returned data for getNextTrainingSessionForTrainer: ${JSON.stringify(data)}`)
+            console.log(`Returned response for getNextTrainingSessionForTrainer: ${JSON.stringify(response)}`)
 
-            setNextTrainingSession(data)
+            const respBody = await response.json();
+            
+            // DEBUGGING
+            console.log(`Returned data for getNextTrainingSessionForTrainer: ${JSON.stringify(respBody)}`)
+
+            setNextTrainingSession(respBody.data)
+        
         } catch (error) {
             console.error("Error, failed to get next Training Session", error)
         }
