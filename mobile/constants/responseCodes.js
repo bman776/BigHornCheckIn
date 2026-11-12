@@ -1,0 +1,17 @@
+export const SERVER_ERROR_RESPONSE = {
+    INTERNAL_SERVER_ERROR: 500,
+    BAD_GATEWAY: 502
+};
+
+export const CLIENT_ERROR_RESPONSE = {
+    BAD_REQUEST: 400,
+    UNAUTHORIZED: 401,
+    FORBIDDEN: 403,
+    NOT_FOUND: 404
+};
+
+export const SUCCESSFUL_RESPONSE = {
+    OK: 200,
+    CREATED: 201,
+    ACCEPTED: 202,
+};

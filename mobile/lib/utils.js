@@ -1,3 +1,5 @@
+import {TimelineEventProps, CalendarUtils} from 'react-native-calendars';
+
 // lib/utils.js
 export function formatDate(dateString) {
   // format date nicely
@@ -8,4 +10,10 @@ export function formatDate(dateString) {
     month: "long",
     day: "numeric",
   });
+}
+
+export const getDate = (offset = 0) => {
+  const date = new Date();
+  date.setDate(date.getDate()+offset);
+  return CalendarUtils.getCalendarDateString(date)
 }

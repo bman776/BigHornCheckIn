@@ -2,8 +2,10 @@
 
 import { useState, useCallback } from "react"
 import { Alert } from "react-native"
+import { API_URL } from "../constants/api"
+import { CLIENT_ERROR_RESPONSE } from "../constants/responseCodes"
 
-const API_URL = "https://bighorncheckin-api.onrender.com/api" 
+//const API_URL = "https://bighorncheckin-api.onrender.com/api" 
 
 export const useTrainingSessions = (trainerID) => {
     const [trainingSessions, setTrainingSessions] = useState([])
@@ -20,19 +22,27 @@ export const useTrainingSessions = (trainerID) => {
     const getAllTrainingSessionsForTrainer = useCallback(async () => {
         try{
             const response = await fetch(`${API_URL}/trainingSession/allTrainingSessionsForTrainer/${trainerID}`);
-            if (!response.ok) {
+            if (response.ok) {
+                // DEBUGGING
+                console.log(`Returned response for getAllTrainingSessionsForTrainer: ${JSON.stringify(response)}`);
+                
+                // parse response body
+                const respBody = await response.json();
+                
+                // DEBUGGING
+                console.log(`Returned data for getAllTrainingSessionsForTrainer: ${JSON.stringify(respBody)}`);
+
+                setTrainingSessions(respBody);
+            
+            } else if (response.status === CLIENT_ERROR_RESPONSE.NOT_FOUND) {
+                setTrainingSessions([]);
+            
+            }  else {
+                // DEBUGGING
+                console.log(`type of response code: ${typeof response.status}`)
+
                 throw new Error(`HTTP Error! Status: ${response.status}`);
             }
-            
-            // DEBUGGING
-            console.log(`Returned response for getAllTrainingSessionsForTrainer: ${JSON.stringify(response)}`)
-            
-            const respBody = await response.json();
-            
-            // DEBUGGING
-            console.log(`Returned data for getAllTrainingSessionsForTrainer: ${JSON.stringify(respBody)}`)
-
-            setTrainingSessions(respBody)
         
         } catch (error) {
             console.error("Error, failed to get Training Sessions", error)
@@ -42,19 +52,36 @@ export const useTrainingSessions = (trainerID) => {
     const getNextTrainingSessionForTrainer = useCallback(async () => {
         try{
             const response = await fetch(`${API_URL}/trainingSession/nextTrainingSessionForTrainer/${trainerID}`);
-            if (!response.ok) {
-                throw new Error(respBody.message || `HTTP Error! Status: ${response.status}`);
-            }
+            if (response.ok) {
+                // DEBUGGING
+                console.log(`Returned response for getNextTrainingSessionForTrainer: ${JSON.stringify(response)}`);
 
-            // DEBUGGING
-            console.log(`Returned response for getNextTrainingSessionForTrainer: ${JSON.stringify(response)}`)
+                const respBody = await response.json();
+                
+                // DEBUGGING
+                console.log(`Returned data for getNextTrainingSessionForTrainer: ${JSON.stringify(respBody)}`);
 
-            const respBody = await response.json();
+                setNextTrainingSession(respBody.data)
             
-            // DEBUGGING
-            console.log(`Returned data for getNextTrainingSessionForTrainer: ${JSON.stringify(respBody)}`)
+            } else if (response.status === CLIENT_ERROR_RESPONSE.NOT_FOUND) {
+                setNextTrainingSession({
+                    title: "<Training Session Title>",
+                    startTime: "<Start Time>",
+                    endTime: "<End Time>",
+                    checkedIn: [],
+                    awaiting: []
+                });
+            
+            } else {
+                // DEBUGGING 
+                console.log(`type of response code: ${typeof response.status}`);
+                console.log(`response code value: ${response.status}`)
+                console.log(`type of constant: ${typeof CLIENT_ERROR_RESPONSE.NOT_FOUND}`)
+                console.log(`constant value: ${CLIENT_ERROR_RESPONSE.NOT_FOUND}`)
+                console.log(`condition evaluation: ${response === CLIENT_ERROR_RESPONSE.NOT_FOUND}`);
 
-            setNextTrainingSession(respBody.data)
+                throw new Error(`HTTP Error! Status ${response.status}`);
+            }
         
         } catch (error) {
             console.error("Error, failed to get next Training Session", error)

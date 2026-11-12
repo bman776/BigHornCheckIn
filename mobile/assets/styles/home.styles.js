@@ -79,7 +79,7 @@ export const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 1,
   },
-  balanceCard: {
+  nextTrainingSessionCard: {
     backgroundColor: COLORS.card,
     borderRadius: 20,
     padding: 20,
@@ -93,7 +93,7 @@ export const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
-  balanceTitle: {
+  nextTrainingSessionTitle: {
     fontSize: 16,
     color: COLORS.textLight,
     marginBottom: 8,

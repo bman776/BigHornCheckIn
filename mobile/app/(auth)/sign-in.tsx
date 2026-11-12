@@ -101,6 +101,7 @@ export default function Page() {
     }
   }
 
+  // Client has performed initial sign up and should have recieved verification code via sign-up email
   if (signIn.status === 'needs_client_trust') {
     return (
       <View style={authStyles.container}>
